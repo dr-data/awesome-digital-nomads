@@ -63,43 +63,16 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.PAT }}
 
-      - name: Debug lychee output
-        run: |
-          echo "Lychee exit code: ${{ steps.lychee.outputs.exit_code }}"
-          cat lychee-out.md
-
-      - name: Remove broken links and descriptions
-        if: ${{ contains(steps.lychee.outputs.result, '🚫 Errors') }}
-        run: |
-          echo "Removing broken links..."
-          grep -oP '(?<=\[).*?(?=\])' lychee-out.md | while read -r line; do
-            echo "Removing line containing: $line"
-            sed -i "/\[$line\]/d" README.md
-          done
-          echo "Broken links removed."
-
-      - name: Create Pull Request for removed links
-        if: ${{ contains(steps.lychee.outputs.result, '🚫 Errors') }}
-        uses: peter-evans/create-pull-request@v5
+      - name: Create Issue From File
+        if: ${{ steps.lychee.outputs.exit_code != 0 }}
+        uses: peter-evans/create-issue-from-file@v4
         with:
-          token: ${{ secrets.PAT }}
-          commit-message: Remove broken links from README
-          title: Remove broken links from README
-          body: |
-            This PR removes broken links and their descriptions from the README.md file.
-            Please review the changes and merge if appropriate.
-          branch: remove-broken-links
-          base: main
-
-      - name: Debug pull request creation
-        if: ${{ contains(steps.lychee.outputs.result, '🚫 Errors') }}
-        run: |
-          echo "Pull request creation attempted."
-          git status
-          git diff
+          title: Link Checker Report
+          content-filepath: ./lychee-out.md
+          labels: report, automated issue
 
       - name: Update README after successful link check
-        if: steps.check_commit.outputs.CHECK_LINKS == 'true' && success()
+        if: ${{ steps.lychee.outputs.exit_code == 0 }}
         run: |
           sed -i '/Last checked on:/d' README.md
           echo -e "\nLast checked on: $(date +'%Y-%m-%d')" >> README.md
