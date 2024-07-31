@@ -63,12 +63,12 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.PAT }}
 
-      - name: Remove broken links
+      - name: Remove broken links and descriptions
         if: steps.lychee.outcome == 'failure'
         run: |
-          # Parse lychee output and remove broken links
+          # Parse lychee output and remove broken links and their descriptions
           grep -oP '(?<=\[).*?(?=\])' lychee-out.md | while read -r line; do
-            sed -i "/$line/d" README.md
+            sed -i "/\[$line\]/d" README.md
           done
 
       - name: Create Pull Request for removed links
@@ -79,7 +79,7 @@ jobs:
           commit-message: Remove broken links from README
           title: Remove broken links from README
           body: |
-            This PR removes broken links found in the README.md file.
+            This PR removes broken links and their descriptions from the README.md file.
             Please review the changes and merge if appropriate.
           branch: remove-broken-links
           base: main
