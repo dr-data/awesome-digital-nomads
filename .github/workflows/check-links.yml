@@ -1,56 +1,20 @@
-name: Update README and Check Links live or dead
+name: Check Links
 
 on:
   push:
     branches:
-      - main  # or your default branch name
+      - main
   pull_request:
     paths:
       - 'README.md'
   schedule:
-    - cron: '0 0 * * 0'  # Run weekly on Sundays at 00:00 UTC
+    - cron: '0 0 * * 0'
 
 jobs:
-  update-readme-and-check-links:
-    if: github.actor != 'github-actions[bot]'
+  check-links:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-          token: ${{ secrets.PAT }}
-      
-      - name: Check commit message and update README
-        id: check_commit
-        run: |
-          LATEST_COMMIT_MSG=$(git log -1 --pretty=%B)
-          if [[ $LATEST_COMMIT_MSG == *"-check"* ]]; then
-            echo "CHECK_LINKS=true" >> $GITHUB_OUTPUT
-            sed -i '/Commits until next check:/d' README.md
-            echo -e "\nCommits until next check: 10" >> README.md
-          else
-            PUSH_COUNT=$(git rev-list --count HEAD)
-            COMMITS_UNTIL_NEXT=$((10 - (PUSH_COUNT % 10)))
-            if [ $COMMITS_UNTIL_NEXT -eq 10 ]; then
-              COMMITS_UNTIL_NEXT=0
-            fi
-            if [ $COMMITS_UNTIL_NEXT -eq 0 ]; then
-              echo "CHECK_LINKS=true" >> $GITHUB_OUTPUT
-              sed -i '/Commits until next check:/d' README.md
-              echo -e "\nCommits until next check: 10" >> README.md
-            else
-              echo "CHECK_LINKS=false" >> $GITHUB_OUTPUT
-              sed -i '/Commits until next check:/d' README.md
-              echo -e "\nCommits until next check: $COMMITS_UNTIL_NEXT" >> README.md
-            fi
-          fi
-
-      - name: Commit README changes
-        run: |
-          git config --global user.name 'github-actions[bot]'
-          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
-          git add README.md
-          git diff --quiet && git diff --staged --quiet || (git commit -m "Update README counter [skip ci]" && git push)
 
       - name: Check links with lychee
         id: lychee
@@ -70,6 +34,7 @@ jobs:
           title: Link Checker Report
           content-filepath: ./lychee-out.md
           labels: report, automated issue
+          token: ${{ secrets.PAT }}
 
       - name: Update README after successful link check
         if: ${{ steps.lychee.outputs.exit_code == 0 }}
@@ -80,3 +45,5 @@ jobs:
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
           git add README.md
           git diff --quiet && git diff --staged --quiet || (git commit -m "Update link check date in README [skip ci]" && git push)
+        env:
+          GITHUB_TOKEN: ${{ secrets.PAT }}
