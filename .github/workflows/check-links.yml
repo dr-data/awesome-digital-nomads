@@ -20,11 +20,18 @@ jobs:
       - id: check_count
         run: |
           PUSH_COUNT=$(git rev-list --count HEAD)
-          COMMITS_UNTIL_NEXT=$((10 - (PUSH_COUNT % 2)))
-          SHOULD_CHECK_LINKS=$((PUSH_COUNT % 2 == 0))
+          COMMITS_UNTIL_NEXT=$((10 - (PUSH_COUNT % 10)))
+          if [ $COMMITS_UNTIL_NEXT -eq 10 ]; then
+            COMMITS_UNTIL_NEXT=0
+          fi
+          SHOULD_CHECK_LINKS=$((COMMITS_UNTIL_NEXT == 0))
           echo "Commits until next check: $COMMITS_UNTIL_NEXT"
           echo "should_check_links=$SHOULD_CHECK_LINKS" >> $GITHUB_OUTPUT
-          sed -i 's/Commits until next check: .*/Commits until next check: '"$COMMITS_UNTIL_NEXT"'/' README.md
+          if grep -q "Commits until next check:" README.md; then
+            sed -i 's/Commits until next check: .*/Commits until next check: '"$COMMITS_UNTIL_NEXT"'/' README.md
+          else
+            echo "Commits until next check: $COMMITS_UNTIL_NEXT" >> README.md
+          fi
       - name: Commit and push if changed
         run: |
           git config --global user.name 'GitHub Action'
@@ -52,7 +59,11 @@ jobs:
       if: success()
       run: |
         LAST_CHECKED=$(date +'%Y-%m-%d')
-        sed -i 's/Last checked on: .*/Last checked on: '"$LAST_CHECKED"'/' README.md
+        if grep -q "Last checked on:" README.md; then
+          sed -i 's/Last checked on: .*/Last checked on: '"$LAST_CHECKED"'/' README.md
+        else
+          echo "Last checked on: $LAST_CHECKED" >> README.md
+        fi
     - name: Commit and push if changed
       run: |
         git config --global user.name 'GitHub Action'
