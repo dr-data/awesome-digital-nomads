@@ -52,57 +52,20 @@ jobs:
           git add README.md
           git diff --quiet && git diff --staged --quiet || (git commit -m "Update README counter [skip ci]" && git push)
 
-      - name: Setup Dart
+      - name: Check links with lychee
         if: steps.check_commit.outputs.CHECK_LINKS == 'true'
-        uses: dart-lang/setup-dart@v1
-
-      - name: Install linkcheck
-        if: steps.check_commit.outputs.CHECK_LINKS == 'true'
-        run: dart pub global activate linkcheck
-
-      - name: Extract and clean URLs from README
-        if: steps.check_commit.outputs.CHECK_LINKS == 'true'
-        run: |
-          grep -oP '(?<=\()https?://[^\s)]+' README.md | sed 's/%09//g' | sed 's/[[:space:]]*$//' > urls.txt
-
-      - name: Check links individually
-        if: steps.check_commit.outputs.CHECK_LINKS == 'true'
-        run: |
-          mkdir -p linkcheck_results
-          while IFS= read -r url
-          do
-            echo "Checking: $url"
-            timeout 30s linkcheck "$url" -e > "linkcheck_results/$(echo $url | md5sum | cut -d' ' -f1).txt" 2>&1 || echo "Error or timeout occurred for $url"
-          done < urls.txt
-
-      - name: Compile linkcheck results
-        if: steps.check_commit.outputs.CHECK_LINKS == 'true'
-        run: |
-          echo "Linkcheck Results:" > linkcheck-report.txt
-          for file in linkcheck_results/*.txt; do
-            echo "Results for $(basename "$file" .txt):" >> linkcheck-report.txt
-            cat "$file" >> linkcheck-report.txt
-            echo "--------------------" >> linkcheck-report.txt
-          done
-
-      - name: Display linkcheck output
-        if: steps.check_commit.outputs.CHECK_LINKS == 'true'
-        run: |
-          cat linkcheck-report.txt
-
-      - name: Process linkcheck results
-        if: steps.check_commit.outputs.CHECK_LINKS == 'true'
-        id: process_results
-        run: |
-          if grep -q "ERROR" linkcheck-report.txt; then
-            echo "DEAD_LINKS_FOUND=true" >> $GITHUB_OUTPUT
-            grep "ERROR" linkcheck-report.txt > dead_links.md
-          else
-            echo "DEAD_LINKS_FOUND=false" >> $GITHUB_OUTPUT
-          fi
+        id: lychee
+        uses: lycheeverse/lychee-action@v1
+        with:
+          args: --verbose --no-progress './README.md'
+          output: ./lychee-out.md
+          format: markdown
+          fail: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.PAT }}
 
       - name: Create Pull Request for dead links
-        if: steps.check_commit.outputs.CHECK_LINKS == 'true' && steps.process_results.outputs.DEAD_LINKS_FOUND == 'true'
+        if: failure()
         uses: peter-evans/create-pull-request@v5
         with:
           token: ${{ secrets.PAT }}
@@ -115,7 +78,7 @@ jobs:
           base: main
 
       - name: Update README after successful link check
-        if: steps.check_commit.outputs.CHECK_LINKS == 'true'
+        if: steps.check_commit.outputs.CHECK_LINKS == 'true' && success()
         run: |
           sed -i '/Last checked on:/d' README.md
           echo -e "\nLast checked on: $(date +'%Y-%m-%d')" >> README.md
