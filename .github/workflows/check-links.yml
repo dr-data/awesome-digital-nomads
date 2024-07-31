@@ -20,7 +20,7 @@ jobs:
       - id: push_count
         run: |
           PUSH_COUNT=$(git rev-list --count HEAD)
-          SHOULD_RUN=$((PUSH_COUNT % 10 == 0))
+          SHOULD_RUN=$((PUSH_COUNT % 3 == 0))
           echo "Push count: $PUSH_COUNT"
           echo "should_run=$SHOULD_RUN" >> $GITHUB_OUTPUT
 
