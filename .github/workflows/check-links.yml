@@ -57,11 +57,17 @@ jobs:
         run: |
           grep -oP '(?<=\()https?://[^\s)]+' README.md > urls.txt
 
+      - name: List extracted URLs
+        if: steps.check_commit.outputs.CHECK_LINKS == 'true'
+        run: |
+          echo "Extracted URLs:"
+          cat urls.txt
+
       - name: Check links with linkcheck
         if: steps.check_commit.outputs.CHECK_LINKS == 'true'
         uses: filiph/linkcheck@2.0.23
         with:
-          arguments: urls.txt -i -e --show-redirects
+          arguments: urls.txt -i -e
 
       - name: Process linkcheck results
         if: steps.check_commit.outputs.CHECK_LINKS == 'true'
