@@ -63,16 +63,23 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.PAT }}
 
-      - name: Remove broken links and descriptions
-        if: steps.lychee.outcome == 'failure'
+      - name: Debug lychee output
         run: |
-          # Parse lychee output and remove broken links and their descriptions
+          echo "Lychee exit code: ${{ steps.lychee.outputs.exit_code }}"
+          cat lychee-out.md
+
+      - name: Remove broken links and descriptions
+        if: ${{ steps.lychee.outputs.exit_code != 0 }}
+        run: |
+          echo "Removing broken links..."
           grep -oP '(?<=\[).*?(?=\])' lychee-out.md | while read -r line; do
+            echo "Removing line containing: $line"
             sed -i "/\[$line\]/d" README.md
           done
+          echo "Broken links removed."
 
       - name: Create Pull Request for removed links
-        if: steps.lychee.outcome == 'failure'
+        if: ${{ steps.lychee.outputs.exit_code != 0 }}
         uses: peter-evans/create-pull-request@v5
         with:
           token: ${{ secrets.PAT }}
@@ -83,6 +90,13 @@ jobs:
             Please review the changes and merge if appropriate.
           branch: remove-broken-links
           base: main
+
+      - name: Debug pull request creation
+        if: ${{ steps.lychee.outputs.exit_code != 0 }}
+        run: |
+          echo "Pull request creation attempted."
+          git status
+          git diff
 
       - name: Update README after successful link check
         if: steps.check_commit.outputs.CHECK_LINKS == 'true' && success()
