@@ -13,6 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       should_run: ${{ steps.push_count.outputs.should_run }}
+      commits_until_next: ${{ steps.push_count.outputs.commits_until_next }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -20,9 +21,11 @@ jobs:
       - id: push_count
         run: |
           PUSH_COUNT=$(git rev-list --count HEAD)
-          SHOULD_RUN=$((PUSH_COUNT % 3 == 0))
+          SHOULD_RUN=$((PUSH_COUNT % 10 == 0))
+          COMMITS_UNTIL_NEXT=$((10 - (PUSH_COUNT % 10)))
           echo "Push count: $PUSH_COUNT"
           echo "should_run=$SHOULD_RUN" >> $GITHUB_OUTPUT
+          echo "commits_until_next=$COMMITS_UNTIL_NEXT" >> $GITHUB_OUTPUT
 
   check-links:
     needs: check-push-count
@@ -40,3 +43,15 @@ jobs:
         use-verbose-mode: 'yes'
         config-file: '.github/workflows/mlc_config.json'
         file-path: './README.md'
+    - name: Update README with check info
+      run: |
+        LAST_CHECKED=$(date +'%Y-%m-%d')
+        COMMITS_UNTIL_NEXT=${{ needs.check-push-count.outputs.commits_until_next }}
+        sed -i 's/Last checked on: .*/Last checked on: '"$LAST_CHECKED"'/' README.md
+        sed -i 's/Commits until next check: .*/Commits until next check: '"$COMMITS_UNTIL_NEXT"'/' README.md
+    - name: Commit and push if changed
+      run: |
+        git config --global user.name 'GitHub Action'
+        git config --global user.email 'action@github.com'
+        git add README.md
+        git diff --quiet && git diff --staged --quiet || (git commit -m "Update link check info in README" && git push)
