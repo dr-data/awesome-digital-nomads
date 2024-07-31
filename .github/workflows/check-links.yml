@@ -1,0 +1,42 @@
+name: Check README Links
+
+on:
+  push:
+  pull_request:
+    paths:
+      - 'README.md'
+  schedule:
+    - cron: '0 0 * * 0'  # Run weekly on Sundays at 00:00 UTC
+
+jobs:
+  check-push-count:
+    runs-on: ubuntu-latest
+    outputs:
+      should_run: ${{ steps.push_count.outputs.should_run }}
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - id: push_count
+        run: |
+          PUSH_COUNT=$(git rev-list --count HEAD)
+          SHOULD_RUN=$((PUSH_COUNT % 10 == 0))
+          echo "Push count: $PUSH_COUNT"
+          echo "should_run=$SHOULD_RUN" >> $GITHUB_OUTPUT
+
+  check-links:
+    needs: check-push-count
+    if: |
+      github.event_name == 'schedule' ||
+      github.event_name == 'pull_request' ||
+      (github.event_name == 'push' && needs.check-push-count.outputs.should_run == 'true')
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Markdown Link Check
+      uses: gaurav-nelson/github-action-markdown-link-check@v1
+      with:
+        use-quiet-mode: 'yes'
+        use-verbose-mode: 'yes'
+        config-file: '.github/workflows/mlc_config.json'
+        file-path: './README.md'
