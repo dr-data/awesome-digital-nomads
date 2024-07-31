@@ -56,7 +56,7 @@ jobs:
         if: steps.check_commit.outputs.CHECK_LINKS == 'true'
         uses: filiph/linkcheck@2.0.23
         with:
-          arguments: https://raw.githubusercontent.com/${{ github.repository }}/main/README.md -e --format=markdown
+          arguments: https://raw.githubusercontent.com/${{ github.repository }}/main/README.md -e
 
       - name: Process linkcheck results
         if: steps.check_commit.outputs.CHECK_LINKS == 'true'
