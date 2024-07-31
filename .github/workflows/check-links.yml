@@ -57,29 +57,38 @@ jobs:
         run: |
           grep -oP '(?<=\()https?://[^\s)]+' README.md | sed 's/%09//g' | sed 's/[[:space:]]*$//' > urls.txt
 
-      - name: List extracted URLs
+      - name: Check links individually
         if: steps.check_commit.outputs.CHECK_LINKS == 'true'
         run: |
-          echo "Extracted URLs:"
-          cat urls.txt
+          mkdir -p linkcheck_results
+          while IFS= read -r url
+          do
+            echo "Checking: $url"
+            timeout 30s filiph/linkcheck@2.0.23 "$url" -e > "linkcheck_results/$(echo $url | md5sum | cut -d' ' -f1).txt" 2>&1 || echo "Error or timeout occurred for $url"
+          done < urls.txt
 
-      - name: Check links with linkcheck
+      - name: Compile linkcheck results
         if: steps.check_commit.outputs.CHECK_LINKS == 'true'
-        uses: filiph/linkcheck@2.0.23
-        with:
-          arguments: -i urls.txt
+        run: |
+          echo "Linkcheck Results:" > linkcheck-report.txt
+          for file in linkcheck_results/*.txt; do
+            echo "Results for $(basename "$file" .txt):" >> linkcheck-report.txt
+            cat "$file" >> linkcheck-report.txt
+            echo "--------------------" >> linkcheck-report.txt
+          done
+
+      - name: Display linkcheck output
+        if: steps.check_commit.outputs.CHECK_LINKS == 'true'
+        run: |
+          cat linkcheck-report.txt
 
       - name: Process linkcheck results
         if: steps.check_commit.outputs.CHECK_LINKS == 'true'
         id: process_results
         run: |
-          if [ -f "linkcheck-report.txt" ]; then
-            if grep -q "ERROR" linkcheck-report.txt; then
-              echo "DEAD_LINKS_FOUND=true" >> $GITHUB_OUTPUT
-              grep "ERROR" linkcheck-report.txt > dead_links.md
-            else
-              echo "DEAD_LINKS_FOUND=false" >> $GITHUB_OUTPUT
-            fi
+          if grep -q "ERROR" linkcheck-report.txt; then
+            echo "DEAD_LINKS_FOUND=true" >> $GITHUB_OUTPUT
+            grep "ERROR" linkcheck-report.txt > dead_links.md
           else
             echo "DEAD_LINKS_FOUND=false" >> $GITHUB_OUTPUT
           fi
