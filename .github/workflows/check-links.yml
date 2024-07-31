@@ -46,14 +46,13 @@ jobs:
           git add README.md
           git diff --quiet && git diff --staged --quiet || (git commit -m "Update README [skip ci]" && git push)
 
-      - name: Markdown Link Check
+      - name: Run Linkspector
         if: steps.check_commit.outputs.CHECK_LINKS == 'true'
-        uses: gaurav-nelson/github-action-markdown-link-check@v1
+        uses: umbrelladocs/action-linkspector@v1
         with:
-          use-quiet-mode: 'yes'
-          use-verbose-mode: 'yes'
-          config-file: '.github/workflows/mlc_config.json'
-          file-path: './README.md'
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          reporter: github-pr-review
+          fail_on_error: true
 
       - name: Update README after successful link check
         if: steps.check_commit.outputs.CHECK_LINKS == 'true' && success()
