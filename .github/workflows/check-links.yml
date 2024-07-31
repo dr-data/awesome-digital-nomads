@@ -52,26 +52,34 @@ jobs:
           git add README.md
           git diff --quiet && git diff --staged --quiet || (git commit -m "Update README counter [skip ci]" && git push)
 
-      - name: Extract and check links
+      - name: Extract URLs from README
         if: steps.check_commit.outputs.CHECK_LINKS == 'true'
-        id: linkcheck
         run: |
-          # Extract URLs from README.md
           grep -oP '(?<=\()https?://[^\s)]+' README.md > urls.txt
-          
-          # Use linkcheck to check the extracted URLs
-          docker run --rm -v $(pwd):/workspace filiph/linkcheck:2.0.23 /workspace/urls.txt -i -e --show-redirects > linkcheck-report.txt
-          
-          # Check if there are any errors in the report
-          if grep -q "ERROR" linkcheck-report.txt; then
-            echo "DEAD_LINKS_FOUND=true" >> $GITHUB_OUTPUT
-            grep "ERROR" linkcheck-report.txt > dead_links.md
+
+      - name: Check links with linkcheck
+        if: steps.check_commit.outputs.CHECK_LINKS == 'true'
+        uses: filiph/linkcheck@2.0.23
+        with:
+          arguments: urls.txt -i -e --show-redirects
+
+      - name: Process linkcheck results
+        if: steps.check_commit.outputs.CHECK_LINKS == 'true'
+        id: process_results
+        run: |
+          if [ -f "linkcheck-report.txt" ]; then
+            if grep -q "ERROR" linkcheck-report.txt; then
+              echo "DEAD_LINKS_FOUND=true" >> $GITHUB_OUTPUT
+              grep "ERROR" linkcheck-report.txt > dead_links.md
+            else
+              echo "DEAD_LINKS_FOUND=false" >> $GITHUB_OUTPUT
+            fi
           else
             echo "DEAD_LINKS_FOUND=false" >> $GITHUB_OUTPUT
           fi
 
       - name: Create Pull Request for dead links
-        if: steps.linkcheck.outputs.DEAD_LINKS_FOUND == 'true'
+        if: steps.check_commit.outputs.CHECK_LINKS == 'true' && steps.process_results.outputs.DEAD_LINKS_FOUND == 'true'
         uses: peter-evans/create-pull-request@v5
         with:
           token: ${{ secrets.PAT }}
