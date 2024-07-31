@@ -1,0 +1,61 @@
+name: Update README and Check Links
+
+on:
+  push:
+  pull_request:
+    paths:
+      - 'README.md'
+  schedule:
+    - cron: '0 0 * * 0'  # Run weekly on Sundays at 00:00 UTC
+
+jobs:
+  update-readme:
+    runs-on: ubuntu-latest
+    outputs:
+      should_check_links: ${{ steps.check_count.outputs.should_check_links }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - id: check_count
+        run: |
+          PUSH_COUNT=$(git rev-list --count HEAD)
+          COMMITS_UNTIL_NEXT=$((10 - (PUSH_COUNT % 2)))
+          SHOULD_CHECK_LINKS=$((PUSH_COUNT % 2 == 0))
+          echo "Commits until next check: $COMMITS_UNTIL_NEXT"
+          echo "should_check_links=$SHOULD_CHECK_LINKS" >> $GITHUB_OUTPUT
+          sed -i 's/Commits until next check: .*/Commits until next check: '"$COMMITS_UNTIL_NEXT"'/' README.md
+      - name: Commit and push if changed
+        run: |
+          git config --global user.name 'GitHub Action'
+          git config --global user.email 'action@github.com'
+          git add README.md
+          git diff --quiet && git diff --staged --quiet || (git commit -m "Update commits until next check in README" && git push)
+
+  check-links:
+    needs: update-readme
+    if: |
+      github.event_name == 'schedule' ||
+      github.event_name == 'pull_request' ||
+      (github.event_name == 'push' && needs.update-readme.outputs.should_check_links == 'true')
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Markdown Link Check
+      uses: gaurav-nelson/github-action-markdown-link-check@v1
+      with:
+        use-quiet-mode: 'yes'
+        use-verbose-mode: 'yes'
+        config-file: '.github/workflows/mlc_config.json'
+        file-path: './README.md'
+    - name: Update README with check date
+      if: success()
+      run: |
+        LAST_CHECKED=$(date +'%Y-%m-%d')
+        sed -i 's/Last checked on: .*/Last checked on: '"$LAST_CHECKED"'/' README.md
+    - name: Commit and push if changed
+      run: |
+        git config --global user.name 'GitHub Action'
+        git config --global user.email 'action@github.com'
+        git add README.md
+        git diff --quiet && git diff --staged --quiet || (git commit -m "Update link check date in README" && git push)
