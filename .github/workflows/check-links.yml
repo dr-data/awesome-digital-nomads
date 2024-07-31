@@ -34,7 +34,7 @@ jobs:
             if [ $COMMITS_UNTIL_NEXT -eq 10 ]; then
               COMMITS_UNTIL_NEXT=0
             fi
-            echo "CHECK_LINKS=${{ COMMITS_UNTIL_NEXT == 0 }}" >> $GITHUB_OUTPUT
+            echo "CHECK_LINKS=$([ $COMMITS_UNTIL_NEXT -eq 0 ] && echo 'true' || echo 'false')" >> $GITHUB_OUTPUT
             sed -i '/Commits until next check:/d' README.md
             echo -e "\nCommits until next check: $COMMITS_UNTIL_NEXT" >> README.md
           fi
