@@ -1,4 +1,4 @@
-name: Update README and Check Links
+name: Update README and Check Links live or dead
 
 on:
   push:
