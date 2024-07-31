@@ -2,6 +2,8 @@ name: Update README and Check Links
 
 on:
   push:
+    branches:
+      - main  # or your default branch name
   pull_request:
     paths:
       - 'README.md'
@@ -10,6 +12,7 @@ on:
 
 jobs:
   update-readme:
+    if: github.actor != 'github-actions[bot]'
     runs-on: ubuntu-latest
     outputs:
       should_check_links: ${{ steps.check_count.outputs.should_check_links }}
@@ -17,30 +20,42 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          token: ${{ secrets.PAT }}
       - id: check_count
         run: |
           PUSH_COUNT=$(git rev-list --count HEAD)
-          COMMITS_UNTIL_NEXT=$((10 - (PUSH_COUNT % 2)))
-          SHOULD_CHECK_LINKS=$((PUSH_COUNT % 2 == 0))
+          COMMITS_UNTIL_NEXT=$((2 - (PUSH_COUNT % 2)))
+          if [ $COMMITS_UNTIL_NEXT -eq 2 ]; then
+            COMMITS_UNTIL_NEXT=0
+          fi
+          SHOULD_CHECK_LINKS=$((COMMITS_UNTIL_NEXT == 0))
           echo "Commits until next check: $COMMITS_UNTIL_NEXT"
           echo "should_check_links=$SHOULD_CHECK_LINKS" >> $GITHUB_OUTPUT
-          sed -i 's/Commits until next check: .*/Commits until next check: '"$COMMITS_UNTIL_NEXT"'/' README.md
+          if grep -q "Commits until next check:" README.md; then
+            sed -i '/Commits until next check:/d' README.md
+            echo -e "\nCommits until next check: $COMMITS_UNTIL_NEXT" >> README.md
+          else
+            echo -e "\nCommits until next check: $COMMITS_UNTIL_NEXT" >> README.md
+          fi
       - name: Commit and push if changed
         run: |
-          git config --global user.name 'GitHub Action'
-          git config --global user.email 'action@github.com'
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
           git add README.md
-          git diff --quiet && git diff --staged --quiet || (git commit -m "Update commits until next check in README" && git push)
+          git diff --quiet && git diff --staged --quiet || (git commit -m "Update commits until next check in README [skip ci]" && git push)
 
   check-links:
     needs: update-readme
     if: |
-      github.event_name == 'schedule' ||
-      github.event_name == 'pull_request' ||
-      (github.event_name == 'push' && needs.update-readme.outputs.should_check_links == 'true')
+      github.actor != 'github-actions[bot]' &&
+      (github.event_name == 'schedule' ||
+       github.event_name == 'pull_request' ||
+       (github.event_name == 'push' && needs.update-readme.outputs.should_check_links == 'true'))
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
+      with:
+        token: ${{ secrets.PAT }}
     - name: Markdown Link Check
       uses: gaurav-nelson/github-action-markdown-link-check@v1
       with:
@@ -52,10 +67,15 @@ jobs:
       if: success()
       run: |
         LAST_CHECKED=$(date +'%Y-%m-%d')
-        sed -i 's/Last checked on: .*/Last checked on: '"$LAST_CHECKED"'/' README.md
+        if grep -q "Last checked on:" README.md; then
+          sed -i '/Last checked on:/d' README.md
+          echo -e "\nLast checked on: $LAST_CHECKED" >> README.md
+        else
+          echo -e "\nLast checked on: $LAST_CHECKED" >> README.md
+        fi
     - name: Commit and push if changed
       run: |
-        git config --global user.name 'GitHub Action'
-        git config --global user.email 'action@github.com'
+        git config --global user.name 'github-actions[bot]'
+        git config --global user.email 'github-actions[bot]@users.noreply.github.com'
         git add README.md
-        git diff --quiet && git diff --staged --quiet || (git commit -m "Update link check date in README" && git push)
+        git diff --quiet && git diff --staged --quiet || (git commit -m "Update link check date in README [skip ci]" && git push)
