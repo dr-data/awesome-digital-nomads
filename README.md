@@ -1,6 +1,5 @@
 # Latest Awesome Digital Nomads - Full List (Alphabetically Ordered)
 
-
 ## Accommodation
 - [Agoda](https://www.agoda.com/) - Hotel booking platform with a strong focus on accommodations in Asia, offering competitive rates and reward programs.
 - [Airbnb](http://airbnb.com) - Popular platform for booking unique accommodations and experiences worldwide, from rooms to entire homes.
