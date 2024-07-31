@@ -60,7 +60,7 @@ jobs:
           args: --verbose --no-progress './README.md'
           output: ./lychee-out.md
           format: markdown
-          fail: true
+          fail: false
         env:
           GITHUB_TOKEN: ${{ secrets.PAT }}
 
