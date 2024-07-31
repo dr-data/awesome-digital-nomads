@@ -64,17 +64,25 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.PAT }}
 
-      - name: Create Pull Request for dead links
-        if: failure()
+      - name: Remove broken links
+        if: steps.lychee.outcome == 'failure'
+        run: |
+          # Parse lychee output and remove broken links
+          grep -oP '(?<=\[).*?(?=\])' lychee-out.md | while read -r line; do
+            sed -i "/$line/d" README.md
+          done
+
+      - name: Create Pull Request for removed links
+        if: steps.lychee.outcome == 'failure'
         uses: peter-evans/create-pull-request@v5
         with:
           token: ${{ secrets.PAT }}
-          commit-message: Remove dead links from README
-          title: Remove dead links from README
+          commit-message: Remove broken links from README
+          title: Remove broken links from README
           body: |
-            This PR removes dead links found in the README.md file.
+            This PR removes broken links found in the README.md file.
             Please review the changes and merge if appropriate.
-          branch: remove-dead-links
+          branch: remove-broken-links
           base: main
 
       - name: Update README after successful link check
