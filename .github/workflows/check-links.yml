@@ -53,7 +53,6 @@ jobs:
           git diff --quiet && git diff --staged --quiet || (git commit -m "Update README counter [skip ci]" && git push)
 
       - name: Check links with lychee
-        if: steps.check_commit.outputs.CHECK_LINKS == 'true'
         id: lychee
         uses: lycheeverse/lychee-action@v1
         with:
