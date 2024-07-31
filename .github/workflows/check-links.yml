@@ -17,6 +17,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          token: ${{ secrets.PAT }}
       - id: check_count
         run: |
           PUSH_COUNT=$(git rev-list --count HEAD)
@@ -48,6 +49,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
+      with:
+        token: ${{ secrets.PAT }}
     - name: Markdown Link Check
       uses: gaurav-nelson/github-action-markdown-link-check@v1
       with:
