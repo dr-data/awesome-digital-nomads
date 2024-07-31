@@ -52,10 +52,10 @@ jobs:
           git add README.md
           git diff --quiet && git diff --staged --quiet || (git commit -m "Update README counter [skip ci]" && git push)
 
-      - name: Extract URLs from README
+      - name: Extract and clean URLs from README
         if: steps.check_commit.outputs.CHECK_LINKS == 'true'
         run: |
-          grep -oP '(?<=\()https?://[^\s)]+' README.md > urls.txt
+          grep -oP '(?<=\()https?://[^\s)]+' README.md | sed 's/%09//g' | sed 's/[[:space:]]*$//' > urls.txt
 
       - name: List extracted URLs
         if: steps.check_commit.outputs.CHECK_LINKS == 'true'
