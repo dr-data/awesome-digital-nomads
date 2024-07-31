@@ -26,17 +26,23 @@ jobs:
           LATEST_COMMIT_MSG=$(git log -1 --pretty=%B)
           if [[ $LATEST_COMMIT_MSG == *"-check"* ]]; then
             echo "CHECK_LINKS=true" >> $GITHUB_OUTPUT
-            echo -e "\nLast checked on: $(date +'%Y-%m-%d')" >> README.md
-            echo -e "\nCommits until next check: 0" >> README.md
+            sed -i '/Commits until next check:/d' README.md
+            echo -e "\nCommits until next check: 10" >> README.md
           else
             PUSH_COUNT=$(git rev-list --count HEAD)
             COMMITS_UNTIL_NEXT=$((10 - (PUSH_COUNT % 10)))
             if [ $COMMITS_UNTIL_NEXT -eq 10 ]; then
               COMMITS_UNTIL_NEXT=0
             fi
-            echo "CHECK_LINKS=$([ $COMMITS_UNTIL_NEXT -eq 0 ] && echo 'true' || echo 'false')" >> $GITHUB_OUTPUT
-            sed -i '/Commits until next check:/d' README.md
-            echo -e "\nCommits until next check: $COMMITS_UNTIL_NEXT" >> README.md
+            if [ $COMMITS_UNTIL_NEXT -eq 0 ]; then
+              echo "CHECK_LINKS=true" >> $GITHUB_OUTPUT
+              sed -i '/Commits until next check:/d' README.md
+              echo -e "\nCommits until next check: 10" >> README.md
+            else
+              echo "CHECK_LINKS=false" >> $GITHUB_OUTPUT
+              sed -i '/Commits until next check:/d' README.md
+              echo -e "\nCommits until next check: $COMMITS_UNTIL_NEXT" >> README.md
+            fi
           fi
 
       - name: Commit README changes
@@ -44,18 +50,44 @@ jobs:
           git config --global user.name 'github-actions[bot]'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
           git add README.md
-          git diff --quiet && git diff --staged --quiet || (git commit -m "Update README [skip ci]" && git push)
+          git diff --quiet && git diff --staged --quiet || (git commit -m "Update README counter [skip ci]" && git push)
 
-      - name: Run Linkspector
+      - name: Check links with linkcheck
         if: steps.check_commit.outputs.CHECK_LINKS == 'true'
-        uses: umbrelladocs/action-linkspector@v1
+        uses: filiph/linkcheck@2.0.23
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          reporter: github-pr-review
-          fail_on_error: true
+          arguments: https://raw.githubusercontent.com/${{ github.repository }}/main/README.md -e --format=markdown
+
+      - name: Process linkcheck results
+        if: steps.check_commit.outputs.CHECK_LINKS == 'true'
+        id: process_results
+        run: |
+          if [ -f "linkcheck-report.txt" ]; then
+            if grep -q "ERROR" linkcheck-report.txt; then
+              echo "DEAD_LINKS_FOUND=true" >> $GITHUB_OUTPUT
+              grep "ERROR" linkcheck-report.txt > dead_links.md
+            else
+              echo "DEAD_LINKS_FOUND=false" >> $GITHUB_OUTPUT
+            fi
+          else
+            echo "DEAD_LINKS_FOUND=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Create Pull Request for dead links
+        if: steps.check_commit.outputs.CHECK_LINKS == 'true' && steps.process_results.outputs.DEAD_LINKS_FOUND == 'true'
+        uses: peter-evans/create-pull-request@v5
+        with:
+          token: ${{ secrets.PAT }}
+          commit-message: Remove dead links from README
+          title: Remove dead links from README
+          body: |
+            This PR removes dead links found in the README.md file.
+            Please review the changes and merge if appropriate.
+          branch: remove-dead-links
+          base: main
 
       - name: Update README after successful link check
-        if: steps.check_commit.outputs.CHECK_LINKS == 'true' && success()
+        if: steps.check_commit.outputs.CHECK_LINKS == 'true'
         run: |
           sed -i '/Last checked on:/d' README.md
           echo -e "\nLast checked on: $(date +'%Y-%m-%d')" >> README.md
