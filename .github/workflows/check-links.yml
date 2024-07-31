@@ -2,6 +2,8 @@ name: Update README and Check Links
 
 on:
   push:
+    branches:
+      - main  # or your default branch name
   pull_request:
     paths:
       - 'README.md'
@@ -10,6 +12,7 @@ on:
 
 jobs:
   update-readme:
+    if: github.actor != 'github-actions[bot]'
     runs-on: ubuntu-latest
     outputs:
       should_check_links: ${{ steps.check_count.outputs.should_check_links }}
@@ -35,17 +38,18 @@ jobs:
           fi
       - name: Commit and push if changed
         run: |
-          git config --global user.name 'GitHub Action'
-          git config --global user.email 'action@github.com'
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
           git add README.md
-          git diff --quiet && git diff --staged --quiet || (git commit -m "Update commits until next check in README" && git push)
+          git diff --quiet && git diff --staged --quiet || (git commit -m "Update commits until next check in README [skip ci]" && git push)
 
   check-links:
     needs: update-readme
     if: |
-      github.event_name == 'schedule' ||
-      github.event_name == 'pull_request' ||
-      (github.event_name == 'push' && needs.update-readme.outputs.should_check_links == 'true')
+      github.actor != 'github-actions[bot]' &&
+      (github.event_name == 'schedule' ||
+       github.event_name == 'pull_request' ||
+       (github.event_name == 'push' && needs.update-readme.outputs.should_check_links == 'true'))
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
@@ -69,7 +73,7 @@ jobs:
         fi
     - name: Commit and push if changed
       run: |
-        git config --global user.name 'GitHub Action'
-        git config --global user.email 'action@github.com'
+        git config --global user.name 'github-actions[bot]'
+        git config --global user.email 'github-actions[bot]@users.noreply.github.com'
         git add README.md
-        git diff --quiet && git diff --staged --quiet || (git commit -m "Update link check date in README" && git push)
+        git diff --quiet && git diff --staged --quiet || (git commit -m "Update link check date in README [skip ci]" && git push)
