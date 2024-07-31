@@ -104,101 +104,50 @@
 - [On The Grid](http://www.onthegrid.city/) - Curated collection of neighborhood guides crafted by local creatives for design-conscious travelers.
 - [OpenSignal](https://opensignal.com/) - Crowd-sou- [Croatia](https://visaguide.world/digital-nomad-visa/croatia/) - One-year visa with the possibility of extension, requires proof of remote work and a minimum monthly income of €2,300.
 
+## Digital Nomad Visas
 - [Czech Republic](https://visaguide.world/digital-nomad-visa/czech-republic/) - One-year visa with the possibility of extension, requires proof of accommodation and health insurance.
-
 - [Estonia](https://visaguide.world/digital-nomad-visa/estonia/) - One-year visa with the option to extend for an additional year, requires proof of income of at least €3,504 per month.
-
 - [Germany](https://visaguide.world/digital-nomad-visa/germany/) - "Freiberufler" visa for freelancers and self-employed individuals, valid for up to three years.
-
 - [Greece](https://visaguide.world/digital-nomad-visa/greece/) - Two-year digital nomad visa requiring proof of sufficient funds (at least €3,500 per month) and remote work arrangement.
-
 - [Iceland](https://visaguide.world/digital-nomad-visa/iceland/) - Six-month visa for remote workers, requiring proof of employment and a minimum monthly income of $7,000.
-
 - [Malta](https://visaguide.world/digital-nomad-visa/malta/) - One-year visa with the possibility of extension, requires proof of remote work and a minimum monthly income of €2,700.
-
 - [Norway (Svalbard)](https://visaguide.world/digital-nomad-visa/norway/) - Two-year visa for Svalbard, requiring proof of remote work and health insurance.
-
 - [Portugal](https://visaguide.world/digital-nomad-visa/portugal/) - Temporary stay visa for up to one year, with a focus on the Madeira Digital Nomad Village project.
-
 - [Spain](https://visaguide.world/digital-nomad-visa/spain/) - Recently approved digital nomad visa, expected to launch in 2023, offering stays of up to five years.
 
 **Caribbean and Central America:**
-
 - [Anguilla](https://visaguide.world/digital-nomad-visa/anguilla/) - Offers a one-year visa with the possibility to extend, applicants must show proof of employment and health insurance.
-
 - [Antigua and Barbuda](https://visaguide.world/digital-nomad-visa/antigua-barbuda/) - A two-year visa requiring proof of employment and a minimum annual income of $50,000.
-
 - [Bahamas](https://visaguide.world/digital-nomad-visa/bahamas/) - One-year visa with the possibility to extend, requires proof of employment and health insurance.
-
 - [Barbados](https://visaguide.world/digital-nomad-visa/barbados/) - Offers a 12-month visa with the option to renew, applicants must have an annual income of at least $50,000.
-
 - [Cayman Islands](https://visaguide.world/digital-nomad-visa/cayman-islands/) - Two-year visa requiring proof of employment and a minimum annual income of $100,000.
-
 - [Costa Rica](https://www.migracion.go.cr/Paginas/Categor%C3%ADa%20Especial%20de%20Trabajador%20o%20Trabajadora%20de%20Ocupaci%C3%B3n%20Espec%C3%ADfica.aspx) - One-year "Rentista" visa for remote workers, renewable for up to two additional years.
-
 - [Curaçao](https://visaguide.world/digital-nomad-visa/curacao/) - Six-month visa with the possibility to extend, requires proof of remote work and health insurance.
-
 - [Dominica](https://visaguide.world/digital-nomad-visa/dominica/) - Offers an 18-month visa requiring proof of remote work and health insurance.
-
 - [Montserrat](https://visaguide.world/digital-nomad-visa/montserrat/) - One-year visa requiring proof of remote work and a minimum annual income of $70,000.
-
 - [Saint Lucia](https://visaguide.world/digital-nomad-visa/saint-lucia/) - One-year visa requiring proof of remote work and health insurance.
 
 **North America:**
-
 - [Mexico](https://visaguide.world/digital-nomad-visa/mexico/) - Temporary resident visa for up to four years, suitable for digital nomads with proof of sufficient funds.
 
 **South America:**
-
 - [Brazil](http://www.portalconsular.itamaraty.gov.br/tabela-de-vistos-para-cidadaos-brasileiros) - Information about visas for Brazilians, including options for digital nomads.
 
 **Africa:**
-
 - [Cabo Verde](https://visaguide.world/digital-nomad-visa/cabo-verde/) - Six-month visa with the possibility of extension, requires proof of remote work and health insurance.
-
 - [Mauritius](https://visaguide.world/digital-nomad-visa/mauritius/) - One-year visa with the option to renew, requires proof of remote work and health insurance.
-
 - [Seychelles](https://visaguide.world/digital-nomad-visa/seychelles/) - One-year visa requiring proof of remote work and health insurance.
 
 **Asia:**
-
 - [Dubai (UAE)](https://visaguide.world/digital-nomad-visa/dubai/) - One-year visa requiring proof of employment and a minimum monthly income of $5,000.
-
 - [Georgia](https://visaguide.world/digital-nomad-visa/georgia/) - One-year visa requiring proof of remote work and a minimum monthly income of $2,000.
-
 - [Indonesia (Bali)](https://visaguide.world/digital-nomad-visa/indonesia/) - Planned five-year visa for digital nomads, requiring proof of remote work and health insurance.
-
 - [Sri Lanka](https://visaguide.world/digital-nomad-visa/sri-lanka/) - One-year visa requiring proof of remote work and health insurance.
-
 - [Taiwan](https://visaguide.world/digital-nomad-visa/taiwan/) - One-year visa requiring proof of remote work and health insurance.
-
 - [Thailand](https://longstay.thaievisa.com/) - Recently introduced 10-year visa for digital nomads, part of the country's efforts to attract high-skilled professionals.
 
 **Oceania:**
-
-- [Bermuda](https://visaguide.world/digital-nomad-visa/bermuda/) - One-year visa for remote workers and students, requiring proof of employment and health insurance. health insurance.
-
-2. [Mauritius](https://visaguide.world/digital-nomad-visa/mauritius/) - One-year visa with the option to renew, requires proof of remote work and health insurance.
-
-3. [Seychelles](https://visaguide.world/digital-nomad-visa/seychelles/) - One-year visa requiring proof of remote work and health insurance.
-
-**Asia:**
-
-1. [Dubai (UAE)](https://visaguide.world/digital-nomad-visa/dubai/) - One-year visa requiring proof of employment and a minimum monthly income of $5,000.
-
-2. [Georgia](https://visaguide.world/digital-nomad-visa/georgia/) - One-year visa requiring proof of remote work and a minimum monthly income of $2,000.
-
-3. [Indonesia (Bali)](https://visaguide.world/digital-nomad-visa/indonesia/) - Planned five-year visa for digital nomads, requiring proof of remote work and health insurance.
-
-4. [Sri Lanka](https://visaguide.world/digital-nomad-visa/sri-lanka/) - One-year visa requiring proof of remote work and health insurance.
-
-5. [Taiwan](https://visaguide.world/digital-nomad-visa/taiwan/) - One-year visa requiring proof of remote work and health insurance.
-
-6. [Thailand](https://longstay.thaievisa.com/) - Recently introduced 10-year visa for digital nomads, part of the country's efforts to attract high-skilled professionals.
-
-**Oceania:**
-
-1. [Bermuda](https://visaguide.world/digital-nomad-visa/bermuda/) - One-year visa for remote workers and students, requiring proof of employment and health insurance.
+- [Bermuda](https://visaguide.world/digital-nomad-visa/bermuda/) - One-year visa for remote workers and students, requiring proof of employment and health insurance.
 
 
 ## Workspaces
