@@ -69,7 +69,7 @@ jobs:
           cat lychee-out.md
 
       - name: Remove broken links and descriptions
-        if: ${{ steps.lychee.outputs.exit_code != 0 }}
+        if: ${{ contains(steps.lychee.outputs.result, '🚫 Errors') }}
         run: |
           echo "Removing broken links..."
           grep -oP '(?<=\[).*?(?=\])' lychee-out.md | while read -r line; do
@@ -79,7 +79,7 @@ jobs:
           echo "Broken links removed."
 
       - name: Create Pull Request for removed links
-        if: ${{ steps.lychee.outputs.exit_code != 0 }}
+        if: ${{ contains(steps.lychee.outputs.result, '🚫 Errors') }}
         uses: peter-evans/create-pull-request@v5
         with:
           token: ${{ secrets.PAT }}
@@ -92,7 +92,7 @@ jobs:
           base: main
 
       - name: Debug pull request creation
-        if: ${{ steps.lychee.outputs.exit_code != 0 }}
+        if: ${{ contains(steps.lychee.outputs.result, '🚫 Errors') }}
         run: |
           echo "Pull request creation attempted."
           git status
