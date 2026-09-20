@@ -25,6 +25,7 @@
 - [Revolut](https://revolut.com) - Digital banking alternative offering multi-currency accounts, competitive exchange rates, and a feature-rich mobile app.
 - [The Elements Of Investing](http://goodreads.com/book/show/6743598-the-elements-of-investing) - Concise guide to fundamental investment principles for long-term financial success.
 - [Toshl Finance](http://toshl.com) - Intuitive personal finance app supporting multiple currencies, ideal for tracking expenses across different countries.
+- [Client Close Kit](https://darweesh128-cmd.github.io/client-close-kit/) - Free browser freelance invoice, quote, timesheet, expense log, change order, and milestone payment schedule tools (no signup).
 - [Wise (formerly called transferwise)](https://wise.com/) - Online money transfer service providing low-fee international transfers and multi-currency accounts for global citizens.
 
 ## Flights
